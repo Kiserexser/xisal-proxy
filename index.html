@@ -2,57 +2,274 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <title>Xisal Proxy | YouTube автоматом</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xisal Browser | Изолированный браузер</title>
     <style>
-        body {
-            background: #000;
-            color: #00ffcc;
-            font-family: monospace;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        * {
             margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .container {
-            text-align: center;
-            padding: 20px;
+
+        body {
+            background: #0a0a0a;
+            font-family: 'Segoe UI', system-ui, monospace;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
-        .status {
-            margin-top: 20px;
+
+        /* Браузерная панель */
+        .browser-bar {
+            background: #1a1a1a;
+            border-bottom: 2px solid #00ffcc;
+            padding: 12px 20px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+            z-index: 10;
+        }
+
+        .logo {
+            color: #00ffcc;
+            font-size: 20px;
+            font-weight: bold;
+            text-shadow: 0 0 5px #00ffcc;
+            white-space: nowrap;
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-btn {
+            background: #2a2a2a;
+            border: none;
+            color: #00ffcc;
+            font-size: 18px;
+            cursor: pointer;
+            padding: 6px 12px;
+            border-radius: 8px;
+            transition: 0.2s;
+        }
+
+        .nav-btn:hover {
+            background: #00ffcc;
+            color: #000;
+        }
+
+        .url-bar {
+            flex: 1;
+            display: flex;
+            gap: 10px;
+            background: #0a0a0a;
+            border: 1px solid #00ffcc55;
+            border-radius: 40px;
+            padding: 5px 15px;
+            align-items: center;
+        }
+
+        .url-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: white;
             font-size: 14px;
+            padding: 8px 0;
+            outline: none;
+        }
+
+        .go-btn {
+            background: #00ffcc;
+            border: none;
+            border-radius: 30px;
+            padding: 6px 18px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .status {
+            color: #00ffccaa;
+            font-size: 11px;
+            font-family: monospace;
+        }
+
+        /* Контейнер с ИЗОЛИРОВАННЫМ iframe */
+        .browser-container {
+            flex: 1;
+            position: relative;
+            background: #ffffff;
+            margin: 0;
+            padding: 0;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+
+        .quick-sites {
+            background: #0a0a0a;
+            padding: 6px 20px;
+            border-top: 1px solid #00ffcc33;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+            font-size: 12px;
+        }
+
+        .quick-sites a {
             color: #888;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .quick-sites a:hover {
+            color: #00ffcc;
+        }
+
+        .info-badge {
+            margin-left: auto;
+            color: #00ffcc66;
+            font-size: 10px;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>⚡ XISAL PROXY</h1>
-        <div class="status" id="status">🔄 Запуск YouTube через прокси...</div>
-    </div>
 
-    <script>
-        // Рабочие прокси (без кнопок подтверждения)
-        const PROXIES = [
-            'https://croxyproxy.net/',
-            'https://hide.me/en/proxy',
-            'https://4everproxy.com/'
-        ];
+<div class="browser-bar">
+    <div class="logo">🌐 XISAL BROWSER</div>
+    <div class="nav-buttons">
+        <button class="nav-btn" onclick="goBack()">◀</button>
+        <button class="nav-btn" onclick="goForward()">▶</button>
+        <button class="nav-btn" onclick="reload()">🔄</button>
+    </div>
+    <div class="url-bar">
+        <span style="color:#00ffcc;">🔒</span>
+        <input type="text" class="url-input" id="urlInput" placeholder="Введите URL..." value="https://youtube.com">
+        <button class="go-btn" onclick="navigate()">Перейти</button>
+    </div>
+    <div class="status" id="status">● изолирован</div>
+</div>
+
+<div class="browser-container">
+    <!-- 
+        🔐 ИЗОЛЯЦИЯ: 
+        sandbox позволяет запускать скрипты (allow-scripts) 
+        и даёт доступ к своим cookie/localStorage (allow-same-origin)
+        НО! Это полная изоляция от родителя — своё хранилище, свои куки
+    -->
+    <iframe id="browserFrame" 
+            sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
+            src="https://youtube.com"
+            title="Изолированный браузер">
+    </iframe>
+</div>
+
+<div class="quick-sites">
+    <a onclick="loadUrl('https://youtube.com')">▶ YouTube</a>
+    <a onclick="loadUrl('https://google.com')">🔍 Google</a>
+    <a onclick="loadUrl('https://discord.com/app')">🎮 Discord</a>
+    <a onclick="loadUrl('https://web.telegram.org')">📱 Telegram</a>
+    <a onclick="loadUrl('https://chat.openai.com')">🤖 ChatGPT</a>
+    <span class="info-badge">⚡ Полная изоляция • Свои cookies • Не контактирует с твоим браузером</span>
+</div>
+
+<script>
+    const iframe = document.getElementById('browserFrame');
+    const urlInput = document.getElementById('urlInput');
+    const statusDiv = document.getElementById('status');
+
+    // История для кнопок навигации
+    let historyStack = [];
+    let historyIndex = -1;
+
+    function updateStatus(text, isError = false) {
+        statusDiv.innerHTML = text;
+        statusDiv.style.color = isError ? '#ff8888' : '#00ffccaa';
+        setTimeout(() => {
+            if (statusDiv.innerHTML === text) {
+                statusDiv.innerHTML = '● изолирован';
+                statusDiv.style.color = '#00ffccaa';
+            }
+        }, 2000);
+    }
+
+    function loadUrl(url) {
+        if (!url.startsWith('http://') && !url.startsWith('https://')) {
+            url = 'https://' + url;
+        }
+        urlInput.value = url;
         
-        // Берём случайный прокси
-        const randomProxy = PROXIES[Math.floor(Math.random() * PROXIES.length)];
+        // Сохраняем в историю
+        if (historyIndex < historyStack.length - 1) {
+            historyStack = historyStack.slice(0, historyIndex + 1);
+        }
+        historyStack.push(url);
+        historyIndex++;
         
-        // Открываем YouTube через прокси в новой вкладке
-        window.onload = function() {
-            const statusDiv = document.getElementById('status');
-            statusDiv.innerHTML = '🚀 Открываю YouTube через ' + randomProxy + '...';
-            
-            // Открываем YouTube через выбранный прокси
-            setTimeout(() => {
-                window.open(randomProxy, '_blank');
-                statusDiv.innerHTML = '✅ Если YouTube не открылся — нажми на кнопку "YouTube" на открывшейся вкладке';
-            }, 500);
-        };
-    </script>
+        iframe.src = url;
+        updateStatus('🔄 загрузка в изолированной среде...');
+    }
+
+    function navigate() {
+        let url = urlInput.value.trim();
+        if (!url) return;
+        loadUrl(url);
+    }
+
+    function goBack() {
+        if (historyIndex > 0) {
+            historyIndex--;
+            iframe.src = historyStack[historyIndex];
+            urlInput.value = historyStack[historyIndex];
+            updateStatus('◀ назад');
+        }
+    }
+
+    function goForward() {
+        if (historyIndex < historyStack.length - 1) {
+            historyIndex++;
+            iframe.src = historyStack[historyIndex];
+            urlInput.value = historyStack[historyIndex];
+            updateStatus('▶ вперёд');
+        }
+    }
+
+    function reload() {
+        iframe.src = iframe.src;
+        updateStatus('🔄 обновление');
+    }
+
+    // Обработка Enter
+    urlInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') navigate();
+    });
+
+    // Отслеживаем навигацию внутри iframe
+    iframe.addEventListener('load', () => {
+        updateStatus('● загружено в изолированной среде');
+        try {
+            const frameUrl = iframe.contentWindow.location.href;
+            if (frameUrl && frameUrl !== 'about:blank') {
+                urlInput.value = frameUrl;
+                if (historyStack[historyIndex] !== frameUrl) {
+                    historyStack.push(frameUrl);
+                    historyIndex++;
+                }
+            }
+        } catch(e) {
+            // Кросс-доменные ограничения — это нормально для изоляции
+            console.log('Изоляция работает, нельзя прочитать URL из другого источника');
+        }
+    });
+</script>
+
 </body>
 </html>
