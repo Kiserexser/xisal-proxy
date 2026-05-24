@@ -1,238 +1,58 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-  <title>Xisal Hub | Быстрый доступ к YouTube</title>
-  <style>
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      user-select: none; /* Убираем выделение текста на кнопках */
-    }
-
-    body {
-      background: radial-gradient(circle at 20% 30%, #0a0f1e, #03060c);
-      font-family: 'Segoe UI', 'Poppins', system-ui, -apple-system, sans-serif;
-      min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-
-    /* Карточка-хаб */
-    .hub-card {
-      max-width: 650px;
-      width: 100%;
-      background: rgba(10, 20, 30, 0.65);
-      backdrop-filter: blur(14px);
-      border-radius: 64px;
-      border: 1px solid rgba(0, 255, 200, 0.35);
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.6), 0 0 18px rgba(0, 255, 200, 0.2);
-      padding: 2rem 1.8rem 2.2rem;
-      text-align: center;
-      transition: 0.2s;
-    }
-
-    h1 {
-      font-size: 2.6rem;
-      font-weight: 800;
-      letter-spacing: -0.5px;
-      background: linear-gradient(135deg, #e0f2fe, #2dd4bf);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-      text-shadow: 0 2px 5px rgba(0,0,0,0.2);
-      margin-bottom: 0.5rem;
-    }
-
-    .sub {
-      color: #9ca3af;
-      margin-bottom: 2rem;
-      font-size: 0.9rem;
-      border-bottom: 1px dashed #2dd4bf40;
-      display: inline-block;
-      padding-bottom: 6px;
-    }
-
-    /* Главные кнопки-прокси */
-    .proxy-grid {
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      margin: 28px 0 32px;
-    }
-
-    .proxy-btn {
-      background: #11181f;
-      border: 1.5px solid #2dd4bf60;
-      border-radius: 100px;
-      padding: 14px 20px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      transition: 0.2s;
-      cursor: pointer;
-      text-decoration: none;
-      color: #e2e8f0;
-      font-weight: 600;
-      font-size: 1.1rem;
-    }
-
-    .proxy-btn:hover {
-      background: #1e2a36;
-      border-color: #2dd4bf;
-      transform: scale(1.01);
-      box-shadow: 0 6px 14px rgba(0, 200, 180, 0.2);
-    }
-
-    .btn-left {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .badge {
-      background: #2dd4bf20;
-      padding: 6px 14px;
-      border-radius: 40px;
-      font-size: 0.7rem;
-      font-weight: 400;
-      color: #7dd3fc;
-      font-family: monospace;
-    }
-
-    /* Альтернатива — 1 клик команда */
-    .code-block {
-      background: #03060c;
-      border-radius: 32px;
-      padding: 18px;
-      text-align: left;
-      margin: 20px 0;
-      border: 1px solid #2dd4bf30;
-    }
-
-    .code-title {
-      color: #7dd3fc;
-      font-size: 0.75rem;
-      text-transform: uppercase;
-      margin-bottom: 8px;
-      letter-spacing: 1px;
-    }
-
-    .command {
-      background: #0a121c;
-      padding: 12px 16px;
-      border-radius: 24px;
-      font-family: 'Fira Code', monospace;
-      font-size: 0.8rem;
-      color: #b9f2e5;
-      word-break: break-all;
-      cursor: pointer;
-      border-left: 4px solid #2dd4bf;
-    }
-
-    .note {
-      font-size: 0.7rem;
-      color: #5b6e8c;
-      margin-top: 16px;
-      text-align: center;
-    }
-
-    hr {
-      border-color: #2dd4bf20;
-      margin: 12px 0;
-    }
-
-    .footer-ip {
-      font-family: monospace;
-      font-size: 0.7rem;
-      color: #2dd4bf80;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <title>Xisal Proxy | YouTube автоматом</title>
+    <style>
+        body {
+            background: #000;
+            color: #00ffcc;
+            font-family: monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+        .status {
+            margin-top: 20px;
+            font-size: 14px;
+            color: #888;
+        }
+    </style>
 </head>
 <body>
-
-<div class="hub-card">
-  <h1>⚡ XISAL GATE</h1>
-  <div class="sub">YouTube · Работает в России — без установки</div>
-
-  <!-- Блок с ТОП веб-прокси (работают прямо в браузере) -->
-  <div class="proxy-grid">
-    <a href="https://croxyproxy.net" target="_blank" class="proxy-btn">
-      <div class="btn-left">
-        <span>🌐</span> CroxyProxy
-      </div>
-      <div class="badge">⭐ Лучший для видео</div>
-    </a>
-
-    <a href="https://hide.me/en/proxy" target="_blank" class="proxy-btn">
-      <div class="btn-left">
-        <span>🛡️</span> Hide.me Proxy
-      </div>
-      <div class="badge">⚡ Без рекламы</div>
-    </a>
-
-    <a href="https://www.proxysite.com" target="_blank" class="proxy-btn">
-      <div class="btn-left">
-        <span>🚀</span> ProxySite
-      </div>
-      <div class="badge">🎥 Поддержка 1080p</div>
-    </a>
-
-    <a href="https://4everproxy.com" target="_blank" class="proxy-btn">
-      <div class="btn-left">
-        <span>🔁</span> 4everproxy
-      </div>
-      <div class="badge">🌍 Много серверов</div>
-    </a>
-  </div>
-
-  <!-- ПРОДВИНУТЫЙ МЕТОД: БЫСТРЫЙ ПРОКСИ ЧЕРЕЗ КОНСОЛЬ (НЕСКОЛЬКО СЕКУНД) -->
-  <div class="code-block">
-    <div class="code-title">🧠 РАБОЧИЙ МЕТОД (консоль браузера)</div>
-    <div class="command" id="consoleCommand">
-      javascript:(function(){window.location='https://cors-anywhere.herokuapp.com/'+window.location.href;})();
+    <div class="container">
+        <h1>⚡ XISAL PROXY</h1>
+        <div class="status" id="status">🔄 Запуск YouTube через прокси...</div>
     </div>
-    <div style="font-size:12px; color:#7aa2f7; margin-top:10px;">
-      ✅ Как использовать:<br>
-      1. Скопируй команду выше <br>
-      2. Открой любую заблокированную страницу (например youtube.com) <br>
-      3. Вставь команду в адресную строку и нажми Enter → сайт откроется через прокси.
-    </div>
-  </div>
 
-  <hr>
-
-  <div class="note">
-    🔒 Все ссылки ведут на публичные веб-прокси, которые не требуют установки.<br>
-    YouTube будет открываться через браузер, без софта.<br>
-    Если прокси тормозит — нажми другую кнопку.
-  </div>
-  <div class="footer-ip" style="margin-top: 16px;">
-    🌍 Для видео в HD используй CroxyProxy или Hide.me
-  </div>
-</div>
-
-<script>
-  // Делаем команду кликабельной для копирования
-  const commandElem = document.getElementById('consoleCommand');
-  if(commandElem) {
-    commandElem.addEventListener('click', () => {
-      const text = commandElem.innerText;
-      navigator.clipboard.writeText(text).then(() => {
-        const originalText = commandElem.innerHTML;
-        commandElem.innerHTML = '✅ СКОПИРОВАНО! Вставь в адресную строку';
-        setTimeout(() => {
-          commandElem.innerHTML = originalText;
-        }, 1800);
-      }).catch(() => {
-        alert('Нажми Ctrl+C вручную');
-      });
-    });
-  }
-</script>
+    <script>
+        // Рабочие прокси (без кнопок подтверждения)
+        const PROXIES = [
+            'https://croxyproxy.net/',
+            'https://hide.me/en/proxy',
+            'https://4everproxy.com/'
+        ];
+        
+        // Берём случайный прокси
+        const randomProxy = PROXIES[Math.floor(Math.random() * PROXIES.length)];
+        
+        // Открываем YouTube через прокси в новой вкладке
+        window.onload = function() {
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = '🚀 Открываю YouTube через ' + randomProxy + '...';
+            
+            // Открываем YouTube через выбранный прокси
+            setTimeout(() => {
+                window.open(randomProxy, '_blank');
+                statusDiv.innerHTML = '✅ Если YouTube не открылся — нажми на кнопку "YouTube" на открывшейся вкладке';
+            }, 500);
+        };
+    </script>
 </body>
 </html>
