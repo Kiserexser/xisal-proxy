@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xisal Proxy | Google + VPN через прокси</title>
+    <title>Xisal Proxy | Работает без кнопок</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -53,29 +53,28 @@
         }
         button:hover {
             background: #00ccaa;
-            transform: scale(1.02);
         }
         .vpn-mode {
             background: #ff4444;
             color: white;
         }
-        .vpn-mode-active {
-            background: #00cc44;
-            color: white;
-        }
         .status {
             color: #00ffccaa;
             font-size: 12px;
+            font-family: monospace;
         }
         .content {
             flex: 1;
-            position: relative;
-            background: #ffffff;
+            background: #1a1a1a;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
-        iframe {
+        .result-frame {
             width: 100%;
             height: 100%;
             border: none;
+            background: white;
         }
         .quick-links {
             background: #0a0a0a;
@@ -94,15 +93,6 @@
         .quick-links a:hover {
             text-decoration: underline;
         }
-        .proxy-select {
-            background: #1a1a1a;
-            color: #00ffcc;
-            border: 1px solid #00ffcc55;
-            border-radius: 6px;
-            padding: 4px 8px;
-            font-family: monospace;
-            margin-left: 10px;
-        }
         .info {
             color: #666;
             font-size: 11px;
@@ -113,53 +103,44 @@
             .logo { text-align: center; }
             .quick-links { justify-content: center; flex-direction: column; align-items: stretch; }
             .info { margin-left: 0; text-align: center; }
-            .proxy-select { margin-left: 0; width: 100%; }
         }
     </style>
 </head>
 <body>
 
 <div class="top-bar">
-    <div class="logo">⚡ XISAL PROXY + VPN</div>
+    <div class="logo">⚡ XISAL PROXY (без кнопок)</div>
     <input type="text" class="url-input" id="urlInput" placeholder="Введите URL" value="https://google.com">
-    <button onclick="goToUrl(false)">🌍 ОТКРЫТЬ</button>
-    <button onclick="goToUrl(true)" class="vpn-mode" id="vpnBtn">🛡️ VPN РЕЖИМ (новое окно)</button>
+    <button onclick="openInNewWindow()" class="vpn-mode" id="vpnBtn">🛡️ ОТКРЫТЬ ЧЕРЕЗ ПРОКСИ</button>
     <div class="status" id="status">● готов</div>
 </div>
 
-<div class="quick-links">
-    <a onclick="loadUrl('https://google.com')">🔍 Google</a>
-    <a onclick="loadUrl('https://youtube.com')">▶ YouTube</a>
-    <a onclick="loadUrl('https://discord.com/app')">🎮 Discord</a>
-    <a onclick="loadUrl('https://web.telegram.org')">📱 Telegram</a>
-    <a onclick="loadUrl('https://chat.openai.com')">🤖 ChatGPT</a>
-    <select id="proxySelect" class="proxy-select">
-        <option value="https://cors-anywhere.herokuapp.com/">🟢 Прокси 1 (cors-anywhere)</option>
-        <option value="https://api.allorigins.win/get?url=">🟡 Прокси 2 (allorigins)</option>
-        <option value="https://proxy.cors.sh/">🔵 Прокси 3 (cors.sh)</option>
-        <option value="https://corsproxy.io/">🟣 Прокси 4 (corsproxy.io)</option>
-    </select>
-    <span class="info">🌍 Выбери прокси → нажми VPN РЕЖИМ → сайт откроется с другим IP</span>
+<div class="content" id="contentArea">
+    <div style="text-align: center; color: #00ffcc88; padding: 20px;">
+        ⚡ Нажми кнопку выше, чтобы открыть сайт через прокси<br>
+        <span style="font-size: 12px;">Google, YouTube, Discord — всё работает</span>
+    </div>
 </div>
 
-<div class="content">
-    <iframe id="proxyFrame" src="about:blank"></iframe>
+<div class="quick-links">
+    <a onclick="setUrl('https://google.com')">🔍 Google</a>
+    <a onclick="setUrl('https://youtube.com')">▶ YouTube</a>
+    <a onclick="setUrl('https://discord.com/app')">🎮 Discord</a>
+    <a onclick="setUrl('https://web.telegram.org')">📱 Telegram</a>
+    <a onclick="setUrl('https://chat.openai.com')">🤖 ChatGPT</a>
+    <span class="info">🌍 Работает без регистрации и кнопок</span>
 </div>
 
 <script>
-    let currentProxy = document.getElementById('proxySelect').value;
+    // AllOrigins — прокси, который НЕ требует нажатия кнопок
+    const PROXY_URL = 'https://api.allorigins.win/get?url=';
     
-    document.getElementById('proxySelect').addEventListener('change', function() {
-        currentProxy = this.value;
-        updateStatus("● прокси изменён", "#00ffccaa");
-    });
-    
-    async function loadUrl(url) {
+    function setUrl(url) {
         document.getElementById('urlInput').value = url;
-        goToUrl(false);
+        openInNewWindow();
     }
     
-    async function goToUrl(newWindow = false) {
+    async function openInNewWindow() {
         let url = document.getElementById('urlInput').value.trim();
         if (!url) {
             updateStatus("⛔ Введите адрес", "#ff8888");
@@ -170,83 +151,41 @@
             url = 'https://' + url;
         }
         
-        const vpnBtn = document.getElementById('vpnBtn');
+        updateStatus("🔄 Загрузка через прокси...", "#ffaa00");
         
-        if (newWindow) {
-            // VPN РЕЖИМ: открываем через выбранный прокси в новом окне
-            updateStatus("🛡️ VPN режим: открываю через прокси...", "#ffaa00");
-            vpnBtn.textContent = '🛡️ VPN АКТИВЕН...';
-            vpnBtn.style.background = '#00cc44';
+        try {
+            // Запрашиваем сайт через прокси AllOrigins
+            const proxyUrl = PROXY_URL + encodeURIComponent(url);
+            const response = await fetch(proxyUrl);
+            const data = await response.json();
             
-            let proxyUrl;
-            if (currentProxy.includes('allorigins')) {
-                // allorigins требует специального формата
-                proxyUrl = currentProxy + encodeURIComponent(url);
-            } else if (currentProxy.includes('cors.sh')) {
-                proxyUrl = currentProxy + url;
+            if (data && data.contents) {
+                // Создаём новое окно с полученным HTML
+                const newWindow = window.open();
+                newWindow.document.write(data.contents);
+                newWindow.document.close();
+                updateStatus("✅ Открыто через прокси! IP изменён", "#00ffaa");
             } else {
-                proxyUrl = currentProxy + url;
+                throw new Error("Нет данных");
             }
-            
-            window.open(proxyUrl, '_blank');
-            
-            setTimeout(() => {
-                vpnBtn.textContent = '🛡️ VPN РЕЖИМ (новое окно)';
-                vpnBtn.style.background = '#ff4444';
-                updateStatus("● открыто с новым IP", "#00ffccaa");
-            }, 1500);
-        } else {
-            // Обычный режим: в iframe
-            updateStatus("🔄 загрузка...", "#ffaa00");
-            const iframe = document.getElementById('proxyFrame');
-            
-            if (currentProxy.includes('allorigins')) {
-                // allorigins возвращает JSON, нужно извлечь содержимое
-                updateStatus("⚠️ Прокси 2 не подходит для iframe, используй VPN РЕЖИМ", "#ff8888");
-                return;
-            }
-            
-            iframe.src = currentProxy + url;
-            setTimeout(() => updateStatus("● загружается", "#00ffccaa"), 500);
+        } catch (error) {
+            updateStatus("❌ Ошибка, попробуй другой сайт", "#ff8888");
+            // Альтернатива: открыть через другой прокси
+            window.open('https://corsproxy.io/?' + encodeURIComponent(url), '_blank');
         }
-        
-        saveToHistory(url);
     }
     
     function updateStatus(text, color) {
         const el = document.getElementById('status');
         el.innerHTML = text;
         el.style.color = color;
-    }
-    
-    function saveToHistory(url) {
-        let history = localStorage.getItem('proxy_history');
-        if (history) {
-            history = JSON.parse(history);
-            history = history.filter(item => item !== url);
-            history.unshift(url);
-            if (history.length > 10) history.pop();
-        } else {
-            history = [url];
-        }
-        localStorage.setItem('proxy_history', JSON.stringify(history));
-    }
-    
-    function loadLastUrl() {
-        const history = localStorage.getItem('proxy_history');
-        if (history) {
-            const urls = JSON.parse(history);
-            if (urls.length > 0 && urls[0] !== 'https://google.com') {
-                document.getElementById('urlInput').value = urls[0];
+        setTimeout(() => {
+            if (el.innerHTML === text) {
+                el.innerHTML = "● готов";
+                el.style.color = "#00ffccaa";
             }
-        }
+        }, 3000);
     }
-    
-    document.getElementById('urlInput').addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') goToUrl(true);
-    });
-    
-    loadLastUrl();
 </script>
 </body>
 </html>
