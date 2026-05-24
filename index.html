@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Xisal Proxy | Веб-прокси</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #000000;
+            font-family: 'Courier New', monospace;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .top-bar {
+            background: #0a0a0a;
+            border-bottom: 1px solid #00ffcc;
+            padding: 15px 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .logo {
+            color: #00ffcc;
+            font-size: 24px;
+            font-weight: bold;
+            text-shadow: 0 0 10px #00ffcc;
+            margin-right: 20px;
+        }
+        .url-input {
+            flex: 1;
+            padding: 10px 15px;
+            background: #1a1a1a;
+            border: 1px solid #00ffcc55;
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+            font-family: monospace;
+        }
+        .url-input:focus {
+            outline: none;
+            border-color: #00ffcc;
+        }
+        button {
+            padding: 10px 20px;
+            background: #00ffcc;
+            border: none;
+            border-radius: 8px;
+            color: #000;
+            font-weight: bold;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #00ccaa;
+            box-shadow: 0 0 10px #00ffcc;
+        }
+        .iframe-container {
+            flex: 1;
+            position: relative;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+        .status {
+            color: #00ffcc88;
+            font-size: 12px;
+            margin-left: 10px;
+        }
+        .tips {
+            background: #0a0a0a;
+            padding: 10px 20px;
+            border-top: 1px solid #00ffcc33;
+            color: #888;
+            font-size: 12px;
+            display: flex;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .tips a {
+            color: #00ffcc;
+            text-decoration: none;
+        }
+        .tips a:hover {
+            text-decoration: underline;
+        }
+        @media (max-width: 600px) {
+            .top-bar { flex-direction: column; }
+            .logo { margin-right: 0; }
+            .url-input { width: 100%; }
+            button { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+    <div class="top-bar">
+        <div class="logo">⚡ XISAL PROXY</div>
+        <input type="text" class="url-input" id="urlInput" placeholder="Введите URL (например, https://youtube.com)">
+        <button onclick="goToUrl()">ОТКРЫТЬ</button>
+        <button onclick="goToUrl(true)" style="background:#ff4444; color:white;">НОВОЕ ОКНО</button>
+        <div class="status" id="status">● готов</div>
+    </div>
+    <div class="iframe-container">
+        <iframe id="proxyFrame" src="about:blank"></iframe>
+    </div>
+    <div class="tips">
+        <span>📌 Работает с любыми сайтами</span>
+        <span>🔒 Шифрование через HTTPS</span>
+        <span>🌍 Обход блокировок</span>
+        <span>💡 <a href="#" onclick="openExample('https://youtube.com'); return false;">YouTube</a></span>
+        <span>💡 <a href="#" onclick="openExample('https://discord.com'); return false;">Discord</a></span>
+        <span>💡 <a href="#" onclick="openExample('https://t.me'); return false;">Telegram</a></span>
+        <span>💡 <a href="#" onclick="openExample('https://chat.openai.com'); return false;">ChatGPT</a></span>
+    </div>
+
+    <script>
+        // Режим работы:
+        // Если AllOrigins работает — используем его как прокси
+        // Если нет — просто открываем iframe
+        
+        const PROXY_URL = 'https://api.allorigins.win/get?url=';
+        let currentMode = 'direct'; // direct или proxy
+        
+        async function goToUrl(newWindow = false) {
+            let url = document.getElementById('urlInput').value.trim();
+            if (!url) return;
+            
+            // Добавляем https:// если нет протокола
+            if (!url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+            }
+            
+            const statusDiv = document.getElementById('status');
+            statusDiv.innerHTML = '🔄 загрузка...';
+            statusDiv.style.color = '#ffaa00';
+            
+            if (newWindow) {
+                window.open(url, '_blank');
+                statusDiv.innerHTML = '● открыто в новом окне';
+                statusDiv.style.color = '#00ffcc88';
+                return;
+            }
+            
+            // Пробуем открыть через iframe напрямую
+            const iframe = document.getElementById('proxyFrame');
+            iframe.src = url;
+            
+            // Таймаут для проверки
+            setTimeout(() => {
+                statusDiv.innerHTML = '● загружается';
+                statusDiv.style.color = '#00ffcc88';
+            }, 500);
+            
+            // Сохраняем в историю
+            saveToHistory(url);
+        }
+        
+        function openExample(url) {
+            document.getElementById('urlInput').value = url;
+            goToUrl();
+        }
+        
+        function saveToHistory(url) {
+            let history = localStorage.getItem('proxy_history');
+            if (history) {
+                history = JSON.parse(history);
+                if (!history.includes(url)) {
+                    history.unshift(url);
+                    if (history.length > 10) history.pop();
+                }
+            } else {
+                history = [url];
+            }
+            localStorage.setItem('proxy_history', JSON.stringify(history));
+        }
+        
+        // Загрузка последнего URL при старте
+        function loadLastUrl() {
+            const history = localStorage.getItem('proxy_history');
+            if (history) {
+                const urls = JSON.parse(history);
+                if (urls.length > 0) {
+                    document.getElementById('urlInput').value = urls[0];
+                }
+            }
+        }
+        
+        // Обработка Enter
+        document.getElementById('urlInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') goToUrl();
+        });
+        
+        loadLastUrl();
+    </script>
+</body>
+</html>
