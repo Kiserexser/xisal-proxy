@@ -3,59 +3,53 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xisal Proxy | YouTube любой сайт</title>
+    <title>Xisal Proxy | Реальный прокси</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: #0a0a0a;
-            font-family: 'Segoe UI', system-ui, monospace;
+            background: #000000;
+            font-family: 'Courier New', monospace;
             height: 100vh;
             display: flex;
             flex-direction: column;
         }
-        /* Верхняя панель */
         .top-bar {
-            background: #000000;
+            background: #0a0a0a;
             border-bottom: 2px solid #00ffcc;
             padding: 12px 20px;
             display: flex;
             gap: 12px;
             flex-wrap: wrap;
             align-items: center;
-            z-index: 10;
         }
         .logo {
             color: #00ffcc;
-            font-size: 22px;
+            font-size: 24px;
             font-weight: bold;
             text-shadow: 0 0 5px #00ffcc;
-            white-space: nowrap;
         }
         .url-input {
             flex: 1;
             padding: 10px 15px;
             background: #1a1a1a;
             border: 1px solid #00ffcc55;
-            border-radius: 30px;
+            border-radius: 8px;
             color: white;
             font-size: 14px;
             font-family: monospace;
-            min-width: 200px;
         }
         .url-input:focus {
             outline: none;
             border-color: #00ffcc;
-            box-shadow: 0 0 8px #00ffcc;
         }
         button {
-            padding: 8px 18px;
+            padding: 10px 20px;
             background: #00ffcc;
             border: none;
-            border-radius: 30px;
+            border-radius: 8px;
             color: #000;
             font-weight: bold;
             cursor: pointer;
-            transition: 0.2s;
         }
         button:hover {
             background: #00ccaa;
@@ -65,16 +59,11 @@
             background: #ff4444;
             color: white;
         }
-        .new-window:hover {
-            background: #cc0000;
-        }
         .status {
             color: #00ffccaa;
             font-size: 12px;
-            font-family: monospace;
         }
-        /* Контейнер с iframe */
-        .iframe-container {
+        .content {
             flex: 1;
             position: relative;
             background: #ffffff;
@@ -83,17 +72,14 @@
             width: 100%;
             height: 100%;
             border: none;
-            background: white;
         }
-        /* Нижняя панель с быстрыми ссылками */
         .quick-links {
-            background: #000000;
+            background: #0a0a0a;
             padding: 8px 20px;
             border-top: 1px solid #00ffcc33;
             display: flex;
             gap: 20px;
             flex-wrap: wrap;
-            font-size: 13px;
         }
         .quick-links a {
             color: #00ffcc;
@@ -102,7 +88,6 @@
         }
         .quick-links a:hover {
             text-decoration: underline;
-            text-shadow: 0 0 3px #00ffcc;
         }
         .info {
             color: #666;
@@ -110,9 +95,8 @@
             margin-left: auto;
         }
         @media (max-width: 600px) {
-            .top-bar { flex-direction: column; align-items: stretch; }
+            .top-bar { flex-direction: column; }
             .logo { text-align: center; }
-            .status { text-align: center; }
             .quick-links { justify-content: center; }
             .info { margin-left: 0; text-align: center; }
         }
@@ -122,77 +106,72 @@
 
 <div class="top-bar">
     <div class="logo">⚡ XISAL PROXY</div>
-    <input type="text" class="url-input" id="urlInput" placeholder="Введите URL: youtube.com, discord.com, t.me ..." value="https://youtube.com">
-    <button onclick="goToUrl(false)">🔓 ОТКРЫТЬ</button>
-    <button onclick="goToUrl(true)" class="new-window">🪟 НОВОЕ ОКНО</button>
+    <input type="text" class="url-input" id="urlInput" placeholder="Введите URL (youtube.com, discord.com...)" value="https://youtube.com">
+    <button onclick="goToUrl(false)">🌍 ОТКРЫТЬ</button>
+    <button onclick="goToUrl(true)" class="new-window">🪟 НОВОЕ ОКНО (ПРОКСИ)</button>
     <div class="status" id="status">● готов</div>
 </div>
 
-<div class="iframe-container">
-    <iframe id="proxyFrame" src="https://youtube.com"></iframe>
+<div class="content">
+    <iframe id="proxyFrame" src="about:blank"></iframe>
 </div>
 
 <div class="quick-links">
     <a onclick="loadUrl('https://youtube.com')">▶ YouTube</a>
     <a onclick="loadUrl('https://discord.com/app')">🎮 Discord</a>
-    <a onclick="loadUrl('https://web.telegram.org')">📱 Telegram Web</a>
+    <a onclick="loadUrl('https://web.telegram.org')">📱 Telegram</a>
     <a onclick="loadUrl('https://chat.openai.com')">🤖 ChatGPT</a>
     <a onclick="loadUrl('https://google.com')">🔍 Google</a>
-    <span class="info">🌍 Обход блокировок • Работает с любыми сайтами</span>
+    <span class="info">🌍 Реальный прокси-сервер • Обход блокировок</span>
 </div>
 
 <script>
-    // Загружает URL в iframe (и сохраняет в историю)
-    function loadUrl(url) {
-        if (!url) return;
+    // ПРОКСИ-СЕРВЕР (бесплатный, не требует установки)
+    const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
+    
+    async function loadUrl(url) {
         document.getElementById('urlInput').value = url;
         goToUrl(false);
     }
-
-    // Основная функция открытия
-    function goToUrl(newWindow = false) {
+    
+    async function goToUrl(newWindow = false) {
         let url = document.getElementById('urlInput').value.trim();
         if (!url) {
             updateStatus("⛔ Введите адрес", "#ff8888");
             return;
         }
-
-        // Добавляем https:// если нет протокола
+        
+        // Добавляем https:// если нет
         if (!url.startsWith('http://') && !url.startsWith('https://')) {
             url = 'https://' + url;
         }
-
+        
         const statusDiv = document.getElementById('status');
-        updateStatus("🔄 загрузка...", "#ffaa00");
-
-        // Открыть в новом окне / вкладке
+        updateStatus("🔄 загрузка через прокси...", "#ffaa00");
+        
         if (newWindow) {
-            window.open(url, '_blank');
-            updateStatus("● открыто в новом окне", "#00ffccaa");
-            return;
+            // Открываем через прокси в новом окне
+            const proxyUrl = PROXY_URL + url;
+            window.open(proxyUrl, '_blank');
+            updateStatus("● открыто в новом окне через прокси", "#00ffccaa");
+        } else {
+            // Загружаем в iframe
+            const iframe = document.getElementById('proxyFrame');
+            iframe.src = PROXY_URL + url;
+            setTimeout(() => {
+                updateStatus("● загружается через прокси", "#00ffccaa");
+            }, 500);
         }
-
-        // Загружаем в iframe
-        const iframe = document.getElementById('proxyFrame');
-        iframe.src = url;
-
-        // Таймаут для обновления статуса
-        setTimeout(() => {
-            updateStatus("● загружается", "#00ffccaa");
-        }, 500);
-
-        // Сохраняем в локальную историю
+        
         saveToHistory(url);
     }
-
-    // Обновление статуса
+    
     function updateStatus(text, color) {
         const el = document.getElementById('status');
         el.innerHTML = text;
         el.style.color = color;
     }
-
-    // История последних 10 сайтов (localStorage)
+    
     function saveToHistory(url) {
         let history = localStorage.getItem('proxy_history');
         if (history) {
@@ -205,29 +184,22 @@
         }
         localStorage.setItem('proxy_history', JSON.stringify(history));
     }
-
-    // Загрузка последнего URL при старте
+    
     function loadLastUrl() {
         const history = localStorage.getItem('proxy_history');
         if (history) {
             const urls = JSON.parse(history);
-            if (urls.length > 0 && urls[0].includes('youtube.com') === false) {
+            if (urls.length > 0) {
                 document.getElementById('urlInput').value = urls[0];
-            } else {
-                // По умолчанию YouTube уже стоит в value
-                document.getElementById('urlInput').value = 'https://youtube.com';
             }
         }
     }
-
-    // Обработка клавиши Enter в поле ввода
+    
     document.getElementById('urlInput').addEventListener('keypress', function(e) {
         if (e.key === 'Enter') goToUrl(false);
     });
-
-    // Загружаем последний URL (или оставляем YouTube)
+    
     loadLastUrl();
 </script>
-
 </body>
 </html>
