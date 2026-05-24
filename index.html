@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xisal Browser | Изолированный браузер</title>
+    <title>Xisal AI | Нейросеть в браузере</title>
     <style>
         * {
             margin: 0;
@@ -12,24 +12,36 @@
         }
 
         body {
-            background: #0a0a0a;
+            background: #000000;
             font-family: 'Segoe UI', system-ui, monospace;
             height: 100vh;
             display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            justify-content: center;
+            align-items: center;
         }
 
-        /* Браузерная панель */
-        .browser-bar {
-            background: #1a1a1a;
-            border-bottom: 2px solid #00ffcc;
-            padding: 12px 20px;
+        .container {
+            width: 100%;
+            max-width: 900px;
+            height: 90vh;
+            background: #0a0a0a;
+            border: 1px solid #00ffcc;
+            border-radius: 24px;
             display: flex;
-            gap: 12px;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(0, 255, 204, 0.1);
+        }
+
+        .header {
+            background: #050505;
+            padding: 16px 20px;
+            border-bottom: 1px solid #00ffcc33;
+            display: flex;
+            justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            z-index: 10;
+            gap: 10px;
         }
 
         .logo {
@@ -37,239 +49,309 @@
             font-size: 20px;
             font-weight: bold;
             text-shadow: 0 0 5px #00ffcc;
-            white-space: nowrap;
-        }
-
-        .nav-buttons {
-            display: flex;
-            gap: 8px;
-        }
-
-        .nav-btn {
-            background: #2a2a2a;
-            border: none;
-            color: #00ffcc;
-            font-size: 18px;
-            cursor: pointer;
-            padding: 6px 12px;
-            border-radius: 8px;
-            transition: 0.2s;
-        }
-
-        .nav-btn:hover {
-            background: #00ffcc;
-            color: #000;
-        }
-
-        .url-bar {
-            flex: 1;
-            display: flex;
-            gap: 10px;
-            background: #0a0a0a;
-            border: 1px solid #00ffcc55;
-            border-radius: 40px;
-            padding: 5px 15px;
-            align-items: center;
-        }
-
-        .url-input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            color: white;
-            font-size: 14px;
-            padding: 8px 0;
-            outline: none;
-        }
-
-        .go-btn {
-            background: #00ffcc;
-            border: none;
-            border-radius: 30px;
-            padding: 6px 18px;
-            color: #000;
-            font-weight: bold;
-            cursor: pointer;
         }
 
         .status {
-            color: #00ffccaa;
+            color: #00ffcc88;
             font-size: 11px;
             font-family: monospace;
+            background: #1a1a1a;
+            padding: 4px 10px;
+            border-radius: 20px;
         }
 
-        /* Контейнер с ИЗОЛИРОВАННЫМ iframe */
-        .browser-container {
+        .model-info {
+            color: #888;
+            font-size: 10px;
+        }
+
+        .chat-area {
             flex: 1;
-            position: relative;
-            background: #ffffff;
-            margin: 0;
-            padding: 0;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
         }
 
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: white;
+        .message {
+            display: flex;
+            max-width: 85%;
         }
 
-        .quick-sites {
-            background: #0a0a0a;
-            padding: 6px 20px;
+        .user-message {
+            align-self: flex-end;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+        }
+
+        .message-content {
+            padding: 12px 18px;
+            border-radius: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+            word-break: break-word;
+            white-space: pre-wrap;
+        }
+
+        .user-message .message-content {
+            background: #00ffcc;
+            color: #000;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot-message .message-content {
+            background: #1a1a1a;
+            border: 1px solid #00ffcc55;
+            color: #00ffcc;
+            border-bottom-left-radius: 4px;
+        }
+
+        .typing {
+            opacity: 0.7;
+            font-style: italic;
+        }
+
+        .input-area {
+            padding: 16px 20px;
             border-top: 1px solid #00ffcc33;
             display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            font-size: 12px;
+            gap: 10px;
+            background: #050505;
         }
 
-        .quick-sites a {
-            color: #888;
-            text-decoration: none;
+        .input-area input {
+            flex: 1;
+            padding: 12px 18px;
+            background: #1a1a1a;
+            border: 1px solid #00ffcc55;
+            border-radius: 30px;
+            color: white;
+            font-size: 14px;
+            outline: none;
+        }
+
+        .input-area input:focus {
+            border-color: #00ffcc;
+        }
+
+        .input-area button {
+            padding: 12px 24px;
+            background: #00ffcc;
+            border: none;
+            border-radius: 30px;
+            color: #000;
+            font-weight: bold;
             cursor: pointer;
+            transition: 0.2s;
         }
 
-        .quick-sites a:hover {
-            color: #00ffcc;
+        .input-area button:hover {
+            background: #00ccaa;
+            transform: scale(1.02);
         }
 
-        .info-badge {
-            margin-left: auto;
-            color: #00ffcc66;
-            font-size: 10px;
+        .input-area button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loader {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border: 2px solid #00ffcc;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #00ffcc;
+            border-radius: 3px;
         }
     </style>
 </head>
 <body>
-
-<div class="browser-bar">
-    <div class="logo">🌐 XISAL BROWSER</div>
-    <div class="nav-buttons">
-        <button class="nav-btn" onclick="goBack()">◀</button>
-        <button class="nav-btn" onclick="goForward()">▶</button>
-        <button class="nav-btn" onclick="reload()">🔄</button>
+<div class="container">
+    <div class="header">
+        <div class="logo">⚡ XISAL AI</div>
+        <div class="model-info" id="modelInfo">⏳ загрузка модели...</div>
+        <div class="status" id="status">● инициализация</div>
     </div>
-    <div class="url-bar">
-        <span style="color:#00ffcc;">🔒</span>
-        <input type="text" class="url-input" id="urlInput" placeholder="Введите URL..." value="https://youtube.com">
-        <button class="go-btn" onclick="navigate()">Перейти</button>
+
+    <div class="chat-area" id="chatArea">
+        <div class="message bot-message">
+            <div class="message-content">
+                ⚡ Привет! Я Xisal AI — нейросеть, работающая прямо в твоём браузере.<br>
+                Модель загружается один раз, после чего я отвечаю оффлайн.<br><br>
+                📌 Напиши что-нибудь...
+            </div>
+        </div>
     </div>
-    <div class="status" id="status">● изолирован</div>
+
+    <div class="input-area">
+        <input type="text" id="userInput" placeholder="Спроси меня о чём угодно..." disabled>
+        <button id="sendBtn" onclick="sendMessage()" disabled>ОТПРАВИТЬ</button>
+    </div>
 </div>
 
-<div class="browser-container">
-    <!-- 
-        🔐 ИЗОЛЯЦИЯ: 
-        sandbox позволяет запускать скрипты (allow-scripts) 
-        и даёт доступ к своим cookie/localStorage (allow-same-origin)
-        НО! Это полная изоляция от родителя — своё хранилище, свои куки
-    -->
-    <iframe id="browserFrame" 
-            sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
-            src="https://youtube.com"
-            title="Изолированный браузер">
-    </iframe>
-</div>
-
-<div class="quick-sites">
-    <a onclick="loadUrl('https://youtube.com')">▶ YouTube</a>
-    <a onclick="loadUrl('https://google.com')">🔍 Google</a>
-    <a onclick="loadUrl('https://discord.com/app')">🎮 Discord</a>
-    <a onclick="loadUrl('https://web.telegram.org')">📱 Telegram</a>
-    <a onclick="loadUrl('https://chat.openai.com')">🤖 ChatGPT</a>
-    <span class="info-badge">⚡ Полная изоляция • Свои cookies • Не контактирует с твоим браузером</span>
-</div>
-
-<script>
-    const iframe = document.getElementById('browserFrame');
-    const urlInput = document.getElementById('urlInput');
-    const statusDiv = document.getElementById('status');
-
-    // История для кнопок навигации
-    let historyStack = [];
-    let historyIndex = -1;
-
-    function updateStatus(text, isError = false) {
-        statusDiv.innerHTML = text;
-        statusDiv.style.color = isError ? '#ff8888' : '#00ffccaa';
-        setTimeout(() => {
-            if (statusDiv.innerHTML === text) {
-                statusDiv.innerHTML = '● изолирован';
-                statusDiv.style.color = '#00ffccaa';
-            }
-        }, 2000);
-    }
-
-    function loadUrl(url) {
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-            url = 'https://' + url;
-        }
-        urlInput.value = url;
-        
-        // Сохраняем в историю
-        if (historyIndex < historyStack.length - 1) {
-            historyStack = historyStack.slice(0, historyIndex + 1);
-        }
-        historyStack.push(url);
-        historyIndex++;
-        
-        iframe.src = url;
-        updateStatus('🔄 загрузка в изолированной среде...');
-    }
-
-    function navigate() {
-        let url = urlInput.value.trim();
-        if (!url) return;
-        loadUrl(url);
-    }
-
-    function goBack() {
-        if (historyIndex > 0) {
-            historyIndex--;
-            iframe.src = historyStack[historyIndex];
-            urlInput.value = historyStack[historyIndex];
-            updateStatus('◀ назад');
+<!-- Подключаем Transformers.js (работает без API, чисто в браузере) -->
+<script type="importmap">
+    {
+        "imports": {
+            "@xenova/transformers": "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.0/dist/transformers.min.js"
         }
     }
-
-    function goForward() {
-        if (historyIndex < historyStack.length - 1) {
-            historyIndex++;
-            iframe.src = historyStack[historyIndex];
-            urlInput.value = historyStack[historyIndex];
-            updateStatus('▶ вперёд');
-        }
-    }
-
-    function reload() {
-        iframe.src = iframe.src;
-        updateStatus('🔄 обновление');
-    }
-
-    // Обработка Enter
-    urlInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') navigate();
-    });
-
-    // Отслеживаем навигацию внутри iframe
-    iframe.addEventListener('load', () => {
-        updateStatus('● загружено в изолированной среде');
-        try {
-            const frameUrl = iframe.contentWindow.location.href;
-            if (frameUrl && frameUrl !== 'about:blank') {
-                urlInput.value = frameUrl;
-                if (historyStack[historyIndex] !== frameUrl) {
-                    historyStack.push(frameUrl);
-                    historyIndex++;
-                }
-            }
-        } catch(e) {
-            // Кросс-доменные ограничения — это нормально для изоляции
-            console.log('Изоляция работает, нельзя прочитать URL из другого источника');
-        }
-    });
 </script>
 
+<script type="module">
+    import { pipeline, env } from '@xenova/transformers';
+    
+    // Настройка (можно убрать, оставлено для совместимости)
+    env.allowLocalModels = true;
+    env.useBrowserCache = true;
+    
+    let generator = null;
+    let isReady = false;
+    
+    const chatArea = document.getElementById('chatArea');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const statusDiv = document.getElementById('status');
+    const modelInfoDiv = document.getElementById('modelInfo');
+    
+    function addMessage(text, isUser = false) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${isUser ? 'user-message' : 'bot-message'}`;
+        messageDiv.innerHTML = `<div class="message-content">${escapeHtml(text)}</div>`;
+        chatArea.appendChild(messageDiv);
+        chatArea.scrollTop = chatArea.scrollHeight;
+        return messageDiv;
+    }
+    
+    function escapeHtml(text) {
+        const div = document.createElement('div');
+        div.textContent = text;
+        return div.innerHTML;
+    }
+    
+    function setTyping(show) {
+        const typingMsg = document.getElementById('typing-indicator');
+        if (show) {
+            if (!typingMsg) {
+                const div = document.createElement('div');
+                div.id = 'typing-indicator';
+                div.className = 'message bot-message';
+                div.innerHTML = `<div class="message-content typing"><span class="loader"></span> Xisal AI печатает...</div>`;
+                chatArea.appendChild(div);
+                chatArea.scrollTop = chatArea.scrollHeight;
+            }
+        } else {
+            const el = document.getElementById('typing-indicator');
+            if (el) el.remove();
+        }
+    }
+    
+    async function sendMessage() {
+        if (!isReady) {
+            addMessage("⚠️ Нейросеть ещё не загрузилась. Подожди немного...", false);
+            return;
+        }
+        
+        const text = userInput.value.trim();
+        if (!text) return;
+        
+        // Добавляем сообщение пользователя
+        addMessage(text, true);
+        userInput.value = '';
+        
+        // Отключаем ввод на время генерации
+        userInput.disabled = true;
+        sendBtn.disabled = true;
+        
+        setTyping(true);
+        
+        try {
+            // Генерируем ответ нейросетью
+            const result = await generator(text, {
+                max_new_tokens: 512,
+                temperature: 0.7,
+                top_p: 0.9,
+                do_sample: true,
+            });
+            
+            const reply = result[0]?.generated_text || "Извини, не смог сгенерировать ответ.";
+            
+            setTyping(false);
+            addMessage(reply, false);
+            
+        } catch (error) {
+            setTyping(false);
+            addMessage(`❌ Ошибка: ${error.message}`, false);
+            console.error(error);
+        }
+        
+        userInput.disabled = false;
+        sendBtn.disabled = false;
+        userInput.focus();
+    }
+    
+    // Загружаем модель (легковесная, ~300-400MB, загружается один раз)
+    async function loadModel() {
+        statusDiv.innerHTML = '● загрузка модели (300MB)...';
+        modelInfoDiv.innerHTML = '📥 скачивание Xisal-Mini...';
+        
+        try {
+            // Используем лёгкую модель, которая работает в браузере
+            generator = await pipeline('text-generation', 'Xenova/tiny-llama-1.1b-chat-v0.4', {
+                progress_callback: (progress) => {
+                    if (progress.progress) {
+                        const percent = Math.round(progress.progress * 100);
+                        modelInfoDiv.innerHTML = `📥 загрузка: ${percent}%`;
+                        statusDiv.innerHTML = `● ${percent}%`;
+                    }
+                }
+            });
+            
+            isReady = true;
+            statusDiv.innerHTML = '● активен (оффлайн)';
+            modelInfoDiv.innerHTML = '🧠 TinyLlama 1.1B • работает локально';
+            userInput.disabled = false;
+            sendBtn.disabled = false;
+            userInput.focus();
+            
+            addMessage("✅ Нейросеть загружена! Теперь я отвечаю прямо в твоём браузере, без интернета и API. Задавай вопросы.", false);
+            
+        } catch (error) {
+            statusDiv.innerHTML = '● ошибка';
+            modelInfoDiv.innerHTML = '❌ не удалось загрузить модель';
+            addMessage(`❌ Ошибка загрузки нейросети: ${error.message}\n\nПроверь соединение и перезагрузи страницу.`, false);
+            console.error(error);
+        }
+    }
+    
+    // Обработка Enter
+    userInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter' && isReady && !sendBtn.disabled) {
+            sendMessage();
+        }
+    });
+    
+    // Запускаем загрузку модели
+    loadModel();
+</script>
 </body>
 </html>
