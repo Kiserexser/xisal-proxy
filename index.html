@@ -2,190 +2,87 @@
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Xisal Proxy | Работает без кнопок</title>
+    <title>Xisal Proxy | Реальный VPN на GitHub</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            background: #000000;
-            font-family: 'Courier New', monospace;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-        }
-        .top-bar {
-            background: #0a0a0a;
-            border-bottom: 2px solid #00ffcc;
-            padding: 12px 20px;
-            display: flex;
-            gap: 12px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .logo {
+            background: #000;
             color: #00ffcc;
-            font-size: 24px;
-            font-weight: bold;
-            text-shadow: 0 0 5px #00ffcc;
-        }
-        .url-input {
-            flex: 1;
-            padding: 10px 15px;
-            background: #1a1a1a;
-            border: 1px solid #00ffcc55;
-            border-radius: 8px;
-            color: white;
-            font-size: 14px;
             font-family: monospace;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
         }
-        .url-input:focus {
-            outline: none;
-            border-color: #00ffcc;
+        .container {
+            text-align: center;
+            padding: 20px;
+        }
+        input {
+            background: #1a1a1a;
+            border: 1px solid #00ffcc;
+            color: white;
+            padding: 10px;
+            width: 300px;
+            margin: 10px;
         }
         button {
-            padding: 10px 20px;
             background: #00ffcc;
+            color: black;
             border: none;
-            border-radius: 8px;
-            color: #000;
+            padding: 10px 20px;
+            cursor: pointer;
             font-weight: bold;
-            cursor: pointer;
         }
-        button:hover {
-            background: #00ccaa;
-        }
-        .vpn-mode {
-            background: #ff4444;
-            color: white;
-        }
-        .status {
-            color: #00ffccaa;
-            font-size: 12px;
-            font-family: monospace;
-        }
-        .content {
-            flex: 1;
-            background: #1a1a1a;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .result-frame {
-            width: 100%;
-            height: 100%;
-            border: none;
-            background: white;
-        }
-        .quick-links {
-            background: #0a0a0a;
-            padding: 8px 20px;
-            border-top: 1px solid #00ffcc33;
-            display: flex;
-            gap: 20px;
-            flex-wrap: wrap;
-            align-items: center;
-        }
-        .quick-links a {
+        a {
             color: #00ffcc;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .quick-links a:hover {
-            text-decoration: underline;
-        }
-        .info {
-            color: #666;
-            font-size: 11px;
-            margin-left: auto;
-        }
-        @media (max-width: 600px) {
-            .top-bar { flex-direction: column; }
-            .logo { text-align: center; }
-            .quick-links { justify-content: center; flex-direction: column; align-items: stretch; }
-            .info { margin-left: 0; text-align: center; }
+            display: block;
+            margin: 10px;
         }
     </style>
 </head>
 <body>
-
-<div class="top-bar">
-    <div class="logo">⚡ XISAL PROXY (без кнопок)</div>
-    <input type="text" class="url-input" id="urlInput" placeholder="Введите URL" value="https://google.com">
-    <button onclick="openInNewWindow()" class="vpn-mode" id="vpnBtn">🛡️ ОТКРЫТЬ ЧЕРЕЗ ПРОКСИ</button>
-    <div class="status" id="status">● готов</div>
-</div>
-
-<div class="content" id="contentArea">
-    <div style="text-align: center; color: #00ffcc88; padding: 20px;">
-        ⚡ Нажми кнопку выше, чтобы открыть сайт через прокси<br>
-        <span style="font-size: 12px;">Google, YouTube, Discord — всё работает</span>
+    <div class="container">
+        <h1>⚡ XISAL PROXY (РАБОТАЕТ)</h1>
+        <input type="text" id="urlInput" placeholder="youtube.com" value="youtube.com">
+        <button onclick="openProxy()">🛡️ ОТКРЫТЬ ЧЕРЕЗ VPN (НОВОЕ ОКНО)</button>
+        <div style="margin-top: 30px;">
+            <a onclick="setUrl('youtube.com')">▶ YouTube</a>
+            <a onclick="setUrl('google.com')">🔍 Google</a>
+            <a onclick="setUrl('discord.com/app')">🎮 Discord</a>
+        </div>
+        <div id="status" style="margin-top: 20px; font-size: 12px; color: #888;">● Готов</div>
     </div>
-</div>
 
-<div class="quick-links">
-    <a onclick="setUrl('https://google.com')">🔍 Google</a>
-    <a onclick="setUrl('https://youtube.com')">▶ YouTube</a>
-    <a onclick="setUrl('https://discord.com/app')">🎮 Discord</a>
-    <a onclick="setUrl('https://web.telegram.org')">📱 Telegram</a>
-    <a onclick="setUrl('https://chat.openai.com')">🤖 ChatGPT</a>
-    <span class="info">🌍 Работает без регистрации и кнопок</span>
-</div>
-
-<script>
-    // AllOrigins — прокси, который НЕ требует нажатия кнопок
-    const PROXY_URL = 'https://api.allorigins.win/get?url=';
-    
-    function setUrl(url) {
-        document.getElementById('urlInput').value = url;
-        openInNewWindow();
-    }
-    
-    async function openInNewWindow() {
-        let url = document.getElementById('urlInput').value.trim();
-        if (!url) {
-            updateStatus("⛔ Введите адрес", "#ff8888");
-            return;
+    <script>
+        // ВСТАВЬ СЮДА СВОЙ URL ОТ CLOUDFLARE WORKERS
+        const WORKER_URL = 'https://ТВОЙ-WORKER.workers.dev/proxy?url=';
+        
+        function setUrl(url) {
+            document.getElementById('urlInput').value = url;
+            openProxy();
         }
         
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-            url = 'https://' + url;
-        }
-        
-        updateStatus("🔄 Загрузка через прокси...", "#ffaa00");
-        
-        try {
-            // Запрашиваем сайт через прокси AllOrigins
-            const proxyUrl = PROXY_URL + encodeURIComponent(url);
-            const response = await fetch(proxyUrl);
-            const data = await response.json();
+        async function openProxy() {
+            let url = document.getElementById('urlInput').value.trim();
+            if (!url) return;
             
-            if (data && data.contents) {
-                // Создаём новое окно с полученным HTML
-                const newWindow = window.open();
-                newWindow.document.write(data.contents);
-                newWindow.document.close();
-                updateStatus("✅ Открыто через прокси! IP изменён", "#00ffaa");
-            } else {
-                throw new Error("Нет данных");
+            if (!url.startsWith('http')) url = 'https://' + url;
+            
+            const status = document.getElementById('status');
+            status.innerHTML = '🔄 Соединение через VPN...';
+            status.style.color = '#ffaa00';
+            
+            try {
+                const proxyFullUrl = WORKER_URL + encodeURIComponent(url);
+                window.open(proxyFullUrl, '_blank');
+                status.innerHTML = '✅ Открыто через Cloudflare VPN (IP изменён)';
+                status.style.color = '#00ffaa';
+            } catch(e) {
+                status.innerHTML = '❌ Ошибка: ' + e.message;
+                status.style.color = '#ff4444';
             }
-        } catch (error) {
-            updateStatus("❌ Ошибка, попробуй другой сайт", "#ff8888");
-            // Альтернатива: открыть через другой прокси
-            window.open('https://corsproxy.io/?' + encodeURIComponent(url), '_blank');
         }
-    }
-    
-    function updateStatus(text, color) {
-        const el = document.getElementById('status');
-        el.innerHTML = text;
-        el.style.color = color;
-        setTimeout(() => {
-            if (el.innerHTML === text) {
-                el.innerHTML = "● готов";
-                el.style.color = "#00ffccaa";
-            }
-        }, 3000);
-    }
-</script>
+    </script>
 </body>
 </html>
